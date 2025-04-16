@@ -1,28 +1,24 @@
 import flet as ft
+ 
+ 
+ def main(page: ft.Page):
+     # установка заголовка
+     page.title = "Привет мир"
+ 
+     # функция, которая будет вызываться при изменении значения текстового поля
+     def change_name(e):
+         print(name_input.value)
 
-def main(page: ft.Page):
-    page.title = "Привет мир"
+     def click_button(e):
+        print(name_input.value)
+ 
+     # создание текстового поля
+     name_input = ft.TextField(
+         label="введите ваше имя",  # текст подсказки
+         on_change=change_name,  # функция, которая будет вызываться при изменении значения
+     )
+    button = ft.ElevatedButton("сохранить", on_click=click_button)
+     # добавление текстового поля на страницу(окно)
+     page.add(name_input,button)
 
-    # список друзей
-    friends = ["Айзат", "Мээрим", "Айзирек", "Гулина", "Нуржан"]
-
-    # функция, которая вызывается при изменении текста
-    def on_text_change(e):
-        # получаем значение из поля ввода
-        user_input = e.control.value.strip()
-
-        # проверяем, есть ли имя в списке
-        if user_input in friends:
-            print(f"{user_input} есть в списке!")
-
-    # поле ввода
-    name_input = ft.TextField(
-        label="Введите имя друга",
-        on_change=on_text_change
-    )
-
-    # добавляем поле на страницу
-    page.add(name_input)
-
-# запускаем приложение
 ft.app(main)
