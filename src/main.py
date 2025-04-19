@@ -1,28 +1,70 @@
 import flet as ft
 
 def main(page: ft.Page):
-    page.title = "Привет мир"
+    page.title = "Список дел"
+    tasks = []
+    task_list = ft.Column()
 
-    # список друзей
-    friends = ["Ayzat", "Nurzhan", "Gulina", "Umar", "Juman"]
+    task_input = ft.TextField(label="Введите задание")
 
-    # функция, которая вызывается при изменении текста
-    def on_text_change(e):
-        # получаем значение из поля ввода
-        user_input = e.control.value.strip()
+    def add_task(e):
+        task = task_input.value.strip()
+        if task:
+            tasks.append(task)
+            print("Текущий список заданий:", tasks)
+            task_list.controls.append(ft.Text(task))
+            task_input.value = ""
+            page.update()
 
-        # проверяем, есть ли имя в списке
-        if user_input in friends:
-            print(f"{user_input} есть в списке!")
+    add_button = ft.ElevatedButton(text="Добавить", on_click=add_task)
 
-    # поле ввода
-    name_input = ft.TextField(
-        label="Введите имя друга",
-        on_change=on_text_change
+    page.add(
+        ft.Text("Список дел на день", size=24, weight=ft.FontWeight.BOLD),
+        task_input,
+        add_button,
+        task_list,
     )
 
-    # добавляем поле на страницу
-    page.add(name_input)
+ft.app(main)
 
-# запускаем приложение
+
+
+# дополнительное задание:
+
+import flet as ft
+
+def main(page: ft.Page):
+    page.title = "Список друзей"
+    friends = []
+    friends_list = ft.Column()
+
+    name_input = ft.TextField(label="Имя друга")
+    surname_input = ft.TextField(label="Фамилия друга")  # Или замените на "Возраст друга"
+
+    def add_friend(e):
+        name = name_input.value.strip()
+        surname = surname_input.value.strip()
+
+        if name and surname:
+            friend = {"name": name, "surname": surname}
+            friends.append(friend)
+            print("Список друзей:", friends)
+
+            # Обновляем отображение
+            friends_list.controls.append(ft.Text(f"{name} {surname}"))
+            name_input.value = ""
+            surname_input.value = ""
+            page.update()
+
+    add_button = ft.ElevatedButton(text="Добавить друга", on_click=add_friend)
+
+    page.add(
+        ft.Text("Добавление друга", size=24, weight=ft.FontWeight.BOLD),
+        name_input,
+        surname_input,
+        add_button,
+        ft.Text("Список друзей:", size=20),
+        friends_list,
+    )
+
 ft.app(main)
