@@ -1,22 +1,29 @@
 import flet as ft
 
 def main(page: ft.Page):
-    page.title = "Проверка имени"
+    page.title = "Список друзей"
 
-    # Список имён друзей
-    friends = ["Ayzat", "Gulina", "Jumagul", "Jazgul", "Sezim"]
+    # Пустой список друзей
+    friends = []
 
-    def change_name(e):
-        entered_name = name_input.value.strip()
-        if entered_name in friends:
-            print(f"{entered_name} есть в списке.")
+    def add_friend(e):
+        name = name_input.value.strip()
+        age = age_input.value.strip()
+
+        if name and age.isdigit():  # Проверяем, что возраст — число
+            friend = {"name": name, "age": int(age)}
+            friends.append(friend)
+            print(f"Список друзей: {friends}")
+            name_input.value = ""
+            age_input.value = ""
+            page.update()
         else:
-            print(f"{entered_name} не найден в списке.")
+            print("Введите корректные имя и возраст (возраст должен быть числом).")
 
-    name_input = ft.TextField(
-        label="Введите ваше имя", on_change=change_name
-    )
+    name_input = ft.TextField(label="Имя друга")
+    age_input = ft.TextField(label="Возраст друга")
+    add_button = ft.ElevatedButton(text="Добавить друга", on_click=add_friend)
 
-    page.add(name_input)
+    page.add(name_input, age_input, add_button)
 
 ft.app(target=main)
