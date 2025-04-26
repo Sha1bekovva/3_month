@@ -3,47 +3,52 @@ import flet as ft
 def main(page: ft.Page):
     page.title = "Учёт расходов"
 
-    expenses = []  # Список для хранения всех расходов
-    total_amount = 0  # Общая сумма
+    expenses = []
+    total_amount = 0
 
-    # Колонка для отображения списка расходов
-    expenses_list = ft.Column()
-    # Текст для отображения общей суммы
-    total_text = ft.Text("Общая сумма: 0 сом")
+    # Колонка для отображения списка расходов с прокруткой
+    expenses_list = ft.Column(scroll=ft.ScrollMode.AUTO)
+
+    total_text = ft.Text("Общая сумма: 0 сом", weight=ft.FontWeight.BOLD)
 
     def add_expense(e):
-        nonlocal total_amount  # Чтобы менять переменную снаружи
+        nonlocal total_amount
 
         description = desc_input.value.strip()
         amount_str = amount_input.value.strip()
 
-        # Проверяем, что сумма является числом и положительным
         if description and amount_str.replace(".", "", 1).isdigit():
             amount = float(amount_str)
 
-            if amount > 0:  # Если сумма положительная
+            if amount > 0:
                 expenses.append({"desc": description, "amount": amount})
 
-                # Определяем цвет в зависимости от суммы
+                # Определяем цвет суммы
                 if amount <= 100:
-                    color = ft.Colors.GREEN
+                    amount_color = ft.Colors.GREEN
                 elif amount <= 1000:
-                    color = ft.Colors.PINK
+                    amount_color = ft.Colors.PINK
                 elif amount <= 10000:
-                    color = ft.Colors.RED
+                    amount_color = ft.Colors.RED
                 else:
-                    color = ft.Colors.PURPLE
+                    amount_color = ft.Colors.PURPLE
 
-                # Обновляем визуальный список с нужным цветом
+                # Добавляем строку расхода с отдельными текстами и кнопками
                 expenses_list.controls.append(
-                    ft.Text(f"{description} — {amount} сом", color=color)
+                    ft.Row(
+                        [
+                            ft.Text(description, expand=2),  # Название
+                            ft.Text(f"{amount} сом", color=amount_color, expand=1, text_align=ft.TextAlign.RIGHT),  # Сумма
+                            ft.IconButton(icon=ft.icons.EDIT, icon_color=ft.Colors.BLUE),  # Кнопка редактирования
+                            ft.IconButton(icon=ft.icons.DELETE, icon_color=ft.Colors.RED),  # Кнопка удаления
+                        ],
+                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                    )
                 )
 
-                # Обновляем общую сумму
                 total_amount += amount
                 total_text.value = f"Общая сумма: {total_amount} сом"
 
-                # Очищаем поля ввода
                 desc_input.value = ""
                 amount_input.value = ""
                 page.update()
@@ -53,13 +58,22 @@ def main(page: ft.Page):
             print("Введите корректную сумму (например: 1250).")
 
     # Поля ввода
-    desc_input = ft.TextField(label="На что потрачено?")
-    amount_input = ft.TextField(label="Сколько?", keyboard_type=ft.KeyboardType.NUMBER)
+    desc_input = ft.TextField(label="На что потрачено?", expand=2)
+    amount_input = ft.TextField(label="Сколько?", keyboard_type=ft.KeyboardType.NUMBER, expand=1)
 
-    # Кнопка
-    add_button = ft.ElevatedButton(text="Добавить расход", on_click=add_expense)
+    add_button = ft.ElevatedButton(text="Добавить", on_click=add_expense)
+
+    # Верхняя строка с полями ввода и кнопкой
+    input_row = ft.Row(
+        controls=[desc_input, amount_input, add_button],
+        spacing=10,
+    )
 
     # Добавляем всё на страницу
-    page.add(desc_input, amount_input, add_button, expenses_list, total_text)
+    page.add(
+        input_row,
+        expenses_list,
+        total_text,
+    )
 
 ft.app(target=main)
