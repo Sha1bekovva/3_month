@@ -1,37 +1,40 @@
-# database.py
 import sqlite3
 
-class ExpenseDatabase:
-    def __init__(self, db_name="expenses.db"):
-        self.connection = sqlite3.connect(db_name)
-        self.cursor = self.connection.cursor()
-        self.create_table()
+# Создаем базу и таблицу расходов (если ещё нет)
+def init_db():
+    conn = sqlite3.connect('expenses.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS expenses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            amount REAL NOT NULL
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
-    def create_table(self):
-        self.cursor.execute("""
-            CREATE TABLE IF NOT EXISTS expenses (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                amount REAL NOT NULL
-            )
-        """)
-        self.connection.commit()
+# Добавить расход
+def add_expense(title, amount):
+    conn = sqlite3.connect('expenses.db')
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO expenses (title, amount) VALUES (?, ?)', (title, amount))
+    conn.commit()
+    conn.close()
 
-    def add_expense(self, name, amount):
-        self.cursor.execute("""
-            INSERT INTO expenses (name, amount) VALUES (?, ?)
-        """, (name, amount))
-        self.connection.commit()
+# Получить все расходы
+def get_all_expenses():
+    conn = sqlite3.connect('expenses.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM expenses')
+    expenses = cursor.fetchall()
+    conn.close()
+    return expenses
 
-    def get_all_expenses(self):
-        self.cursor.execute("SELECT * FROM expenses")
-        return self.cursor.fetchall()
-
-    def get_total_amount(self):
-        self.cursor.execute("SELECT SUM(amount) FROM expenses")
-        result = self.cursor.fetchone()[0]
-        return result if result is not None else 0
-
-    def close(self):
-        self.connection.close()
-        
+# Удалить расход по ID
+def delete_expense(expense_id):
+    conn = sqlite3.connect('expenses.db')
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM expenses WHERE id = ?', (expense_id,))
+    conn.commit()
+    conn.close()
